@@ -9,6 +9,8 @@ Rails.application.routes.draw do
         post "sign_in", to: "sessions#create"
         delete "log_out", to: "sessions#destroy"
       end
+      get 'history', to: 'calculations#index'
+      post 'calc', to: 'calculations#create'
     end
   end
 end
