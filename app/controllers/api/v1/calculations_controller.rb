@@ -9,7 +9,6 @@ class Api::V1::CalculationsController < ApplicationController
 
     def create
         @calculation = Calculation.new calculation_params
-        p "testear"
         if @calculation.save
             render json: @calculation, status: :created
         else
@@ -29,14 +28,39 @@ class Api::V1::CalculationsController < ApplicationController
 
     private
     def calculation_params
-        p params
-        # params["calculation"]["element"] = '{ "item" : [1, 2, 3]}'
-        object = JSON.parse(params["calculation"]["element"], object_class: OpenStruct)
-        p "objeto"
-        p object
-        p object.item
-        p object.item.instance_of? Array
-        p  params["calculation"]["element"].instance_of? JSON
+        num = params["calculation"]["element"].length()
+        p num
+        json = "["
+        total = 0
+        params["calculation"]["element"].each_with_index { |n, i|
+            if n['elemento'].numeric?
+                dato = n['elemento'].to_f
+                total = total + dato
+                json = json + "#{n['elemento']}"
+                if i < num-1
+                    json = json + ","
+                end
+            end
+        }
+        json = '{"item" : ' + json + "]}"
+        json = json.gsub(",]", "]")
+        p json
+        params["calculation"]["element"]  = json
+        params["calculation"]["total"]  = total
         params.require(:calculation).permit(:total, :element)
     end
+    
+    def number_or_nil( s )
+        number = s.to_i 
+        number = nil if (number.to_s != s)
+        return number
+      end
 end
+class String 
+    def numeric?
+        return true if self =~ /^\d+$/ 
+        true if Float(self) rescue false 
+    end 
+end
+
+
