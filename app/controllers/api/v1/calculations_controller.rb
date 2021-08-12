@@ -9,10 +9,16 @@ class Api::V1::CalculationsController < ApplicationController
 
     def create
         @calculation = Calculation.new calculation_params
-        if @calculation.save
-            render json: @calculation, status: :created
+        p @calculation.element
+        if @calculation.element == "{\"item\" : []}" 
+            json_response "Imposible Realizar una operacion con los campos suministrados", false, {}, :unprocessable_entity
         else
-            json_response "Somthing wrong", false, {}, :unprocessable_entity            
+
+            if @calculation.save
+                render json: @calculation, status: :created
+            else
+                json_response "Somthing wrong", false, {}, :unprocessable_entity            
+            end
         end
     end
 
